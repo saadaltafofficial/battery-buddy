@@ -1,0 +1,5 @@
+.pirate-root { spacing: 2px; padding: 0; border: none; background-color: transparent; }
+.pirate-image { icon-size: 190px; }
+.pirate-message { color: #ffffff; font-weight: 800; font-size: 15px; text-align: center; background-color: rgba(20,23,34,0.86); border-radius: 15px; padding: 8px 10px; }
+.pirate-button { color: #ffffff; background-color: rgba(130,34,48,0.90); border-radius: 15px; padding: 8px 12px; font-size: 13px; font-weight: bold; }
+.pirate-button:hover { background-color: #b83e51; }
