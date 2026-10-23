@@ -1,118 +1,152 @@
+// Generated with AI for personal use.
+// Do NOT upload to extensions.gnome.org (EGO) unless you understand JavaScript
+// and can maintain this code.
 import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
-import Gio from 'gi://Gio';
 import St from 'gi://St';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
 
-const BAT = '/sys/class/power_supply/BAT0';
-const DEMO = `${GLib.get_home_dir()}/.cache/battery-buddy-demo`;
-const POLL_SECONDS = 3;
-const CORNER_MARGIN = 18;
+const DEMO = `${GLib.get_user_cache_dir()}/battery-buddy-demo`;
+const CHARACTERS = {pirate: '🏴‍☠️', cat: '🐈', robot: '🤖', ghost: '👻', dragon: '🐉', penguin: '🐧', fox: '🦊', owl: '🦉'};
 
-function readText(path) {
+function readFile(path) {
     try { return new TextDecoder().decode(GLib.file_get_contents(path)[1]).trim(); }
-    catch (_) { return null; }
+    catch { return null; }
 }
 
-export default class BatteryBuddyPirate extends Extension {
+function batteryInfo() {
+    const root = '/sys/class/power_supply';
+    const dir = GLib.Dir.open(root, 0);
+    let name;
+    while ((name = dir.read_name()) !== null) {
+        if (!name.startsWith('BAT')) continue;
+        const capacity = Number.parseInt(readFile(`${root}/${name}/capacity`), 10);
+        const status = readFile(`${root}/${name}/status`)?.toLowerCase();
+        if (Number.isFinite(capacity) && status) return {capacity, status};
+    }
+    return null;
+}
+
+export default class BatteryBuddy extends Extension {
     enable() {
-        this._tickId = null;
-        this._currentKind = null;
+        this._settings = this.getSettings();
+        this._current = null;
         this._corner = 0;
-        this._lastDemo = null;
-        this._animating = false;
-        this._container = new St.BoxLayout({vertical: true, style_class: 'pirate-root', reactive: true, can_focus: true});
-        const file = Gio.File.new_for_path(`${this.path}/pirate.png`);
-        this._image = new St.Icon({gicon: new Gio.FileIcon({file}), icon_size: 190,
-            style_class: 'pirate-image'});
-        this._container.add_child(this._image);
-        this._label = new St.Label({style_class: 'pirate-message', text: ''});
-        this._container.add_child(this._label);
-        this._action = new St.Button({label: 'Got it? Catch me!', style_class: 'pirate-button', can_focus: true});
-        this._action.connect('clicked', () => this._hop());
-        this._container.add_child(this._action);
-        // The actor is the only clickable region; no fullscreen overlay and no giant modal.
-        this._container.hide();
-        Main.layoutManager.addTopChrome(this._container, {affectsStruts: false, trackFullscreen: true});
-        this._monitorsChangedId = Main.layoutManager.connect('monitors-changed', () => this._place(false));
-        this._poll();
-        this._tickId = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, POLL_SECONDS, () => {
-            this._poll();
+        this._source = null;
+        this._settingsId = this._settings.connect('changed', () => { this._configure(); this._check(); });
+        this._monitorId = Main.layoutManager.connect('monitors-changed', () => this._place(false));
+        this._widget = new St.BoxLayout({vertical: true, style_class: 'battery-buddy', reactive: true, can_focus: true});
+        this._character = new St.Label({style_class: 'battery-buddy-character', text: '🏴‍☠️'});
+        this._title = new St.Label({style_class: 'battery-buddy-title', text: ''});
+        this._hint = new St.Label({style_class: 'battery-buddy-hint', text: 'Click to make me move'});
+        this._widget.add_child(this._character);
+        this._widget.add_child(this._title);
+        this._widget.add_child(this._hint);
+        this._widget.connect('button-press-event', () => { this._hop(); return Clutter.EVENT_STOP; });
+        this._widget.hide();
+        Main.layoutManager.addTopChrome(this._widget, {affectsStruts: false, trackFullscreen: true});
+        this._configure();
+        this._check();
+    }
+
+    _configure() {
+        if (this._source) { GLib.Source.remove(this._source); this._source = null; }
+        const seconds = this._settings.get_int('check-interval');
+        this._source = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, seconds, () => {
+            this._check();
             return GLib.SOURCE_CONTINUE;
         });
+        if (this._widget) this._place(false);
     }
 
-    _poll() {
-        const demo = readText(DEMO);
+    _demoKind() {
+        const data = readFile(DEMO);
+        if (!data) return null;
+        const [kind, expiry] = data.split(/\s+/);
+        return ['high', 'low'].includes(kind) && Number(expiry) > Date.now() / 1000 ? kind : null;
+    }
+
+    _check() {
+        if (!this._widget) return;
+        const battery = batteryInfo();
+        const demo = this._demoKind();
         let kind = null;
-        let pct = Number.parseInt(readText(`${BAT}/capacity`), 10);
-        const status = readText(`${BAT}/status`)?.toLowerCase();
-        if (demo) {
-            const [requested, expiresText] = demo.split(' ');
-            if (Number(expiresText) > Math.floor(Date.now() / 1000) && ['high', 'low'].includes(requested)) {
-                kind = requested;
-                pct = requested === 'high' ? 80 : 20;
-            }
+        let pct = battery?.capacity ?? 0;
+        if (demo) { kind = demo; pct = demo === 'high' ? this._settings.get_int('high-threshold') : this._settings.get_int('low-threshold'); }
+        else if (battery && this._settings.get_boolean('alerts-enabled')) {
+            if (pct >= this._settings.get_int('high-threshold') && ['charging', 'full'].includes(battery.status)) kind = 'high';
+            if (pct <= this._settings.get_int('low-threshold') && battery.status === 'discharging') kind = 'low';
         }
         if (!kind) {
-            if (pct >= 80 && ['charging', 'full'].includes(status)) kind = 'high';
-            if (pct <= 20 && status === 'discharging') kind = 'low';
-        }
-        if (kind === this._currentKind) {
-            if (kind) this._refreshLabel(kind, pct);
+            this._current = null;
+            this._widget.remove_all_transitions();
+            this._widget.hide();
             return;
         }
-        this._currentKind = kind;
-        if (!kind) {
-            this._container.remove_all_transitions();
-            this._container.hide();
-            return;
+        const changed = kind !== this._current;
+        this._current = kind;
+        const character = this._settings.get_string('character');
+        this._character.text = CHARACTERS[character] ?? CHARACTERS.pirate;
+        this._title.text = kind === 'high' ? `${pct}% · Unplug charger!` : `${pct}% · Plug in charger!`;
+        this._hint.visible = this._settings.get_boolean('show-hint');
+        this._widget.set_style(`font-size: ${this._settings.get_int('character-size')}px;`);
+        if (changed) {
+            this._corner = this._settings.get_int('start-corner');
+            this._widget.show();
+            this._place(false);
+            this._widget.opacity = 0;
+            this._widget.ease({opacity: 255, duration: 250, mode: Clutter.AnimationMode.EASE_OUT_QUAD});
+        } else this._place(false);
+    }
+
+    _monitor() {
+        const monitors = Main.layoutManager.monitors;
+        if (!monitors?.length) return null;
+        const option = this._settings.get_string('monitor');
+        if (option === 'external') return monitors.find(m => m !== Main.layoutManager.primaryMonitor) ?? monitors[0];
+        if (option === 'pointer') {
+            const [x, y] = global.get_pointer();
+            return monitors.find(m => x >= m.x && x < m.x + m.width && y >= m.y && y < m.y + m.height) ?? monitors[0];
         }
-        this._corner = 0;
-        this._refreshLabel(kind, pct);
-        this._container.show();
-        this._place(false);
-        this._container.opacity = 0;
-        this._container.ease({opacity: 255, duration: 350, mode: Clutter.AnimationMode.EASE_OUT_QUAD});
+        return Main.layoutManager.primaryMonitor ?? monitors[0];
     }
 
-    _refreshLabel(kind, pct) {
-        const s = kind === 'high' ? `🔌 ${pct}% — Unplug, mate!` : `⚡ ${pct}% — Plug me in!`;
-        if (this._label.text !== s) this._label.text = s;
-    }
-
-    _place(animated) {
-        if (!this._container || !this._currentKind) return;
-        const mon = Main.layoutManager.primaryMonitor ?? Main.layoutManager.monitors[0];
-        if (!mon) return;
-        // Four positions, always within the actual primary monitor rectangle.
-        const width = 230, height = 275;
-        this._container.set_size(width, height);
-        const x = (this._corner % 2 === 0) ? mon.x + CORNER_MARGIN : mon.x + mon.width - width - CORNER_MARGIN;
-        const y = (this._corner < 2) ? mon.y + 45 : mon.y + mon.height - height - CORNER_MARGIN;
-        if (!animated) { this._container.set_position(x, y); return; }
-        this._container.remove_all_transitions();
-        this._container.ease({x, y, duration: 520, mode: Clutter.AnimationMode.EASE_OUT_BACK});
+    _place(animate) {
+        if (!this._widget || !this._current) return;
+        const monitor = this._monitor();
+        if (!monitor) return;
+        const size = this._settings.get_int('character-size');
+        const width = Math.max(170, size + 35), height = size + 92;
+        const margin = this._settings.get_int('edge-margin');
+        this._widget.set_size(width, height);
+        const x = this._corner % 2 === 0 ? monitor.x + margin : monitor.x + monitor.width - width - margin;
+        const y = this._corner < 2 ? monitor.y + margin + 34 : monitor.y + monitor.height - height - margin;
+        this._widget.remove_all_transitions();
+        if (animate && this._settings.get_boolean('animate-hops'))
+            this._widget.ease({x, y, duration: this._settings.get_int('hop-duration'), mode: Clutter.AnimationMode.EASE_OUT_QUAD});
+        else this._widget.set_position(x, y);
     }
 
     _hop() {
-        if (!this._currentKind) return;
+        if (!this._current) return;
         this._corner = (this._corner + 1) % 4;
         this._place(true);
     }
 
     disable() {
-        if (this._tickId) { GLib.Source.remove(this._tickId); this._tickId = null; }
-        if (this._monitorsChangedId) {
-            Main.layoutManager.disconnect(this._monitorsChangedId);
-            this._monitorsChangedId = null;
+        if (this._source) GLib.Source.remove(this._source);
+        if (this._settingsId) this._settings.disconnect(this._settingsId);
+        if (this._monitorId) Main.layoutManager.disconnect(this._monitorId);
+        if (this._widget) {
+            this._widget.remove_all_transitions();
+            Main.layoutManager.removeChrome(this._widget);
+            this._widget.destroy();
         }
-        if (this._container) {
-            this._container.remove_all_transitions();
-            Main.layoutManager.removeChrome(this._container);
-            this._container.destroy();
-            this._container = null;
-        }
+        this._widget = null;
+        this._settings = null;
+        this._source = null;
+        this._settingsId = null;
+        this._monitorId = null;
     }
 }

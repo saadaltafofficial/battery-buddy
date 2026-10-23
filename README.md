@@ -1,41 +1,51 @@
-# Battery Buddy Pirate (GNOME Shell / Wayland)
+# Battery Buddy — Desktop Companions
 
-A **real GNOME Shell desktop extension** for the HP OMEN running Ubuntu 26.04. Small cutout of your supplied pirate; no big background window. The pirate hops between four **primary monitor** corners whenever clicked. It disappears when the battery condition is corrected, not when clicked. Polls sysfs every 3 seconds.
+A configurable GNOME Shell extension that makes battery reminders difficult to ignore, without changing your laptop's charging controls. Works on GNOME Wayland and X11 using GNOME Shell actors.
 
-Conditions: **80%+ and charging/full** → unplug; **20%- and discharging** → plug in. No power-system changes are made.
+## Features
 
-## Install/update
+- **Adjustable thresholds:** unplug while charging at 80% and plug in while discharging at 20% by default
+- **8 companions:** pirate, cat, robot, ghost, dragon, penguin, fox, owl (system emoji glyphs, no copyrighted character art)
+- **Placement:** primary monitor, first non-primary monitor, or monitor under pointer; four starting corners and edge margin
+- **Movement:** jump between four corners on click, optional hop animations and duration control
+- **Appearance:** change character size and interaction hint
+- **Efficiency:** configurable 2–60 second poll interval; sysfs battery state only, no network requests
+- **Demo mode:** preview both kinds of reminders without changing charging state
+
+## Install locally
 
 ```bash
-cd ~/Downloads
-unzip -o battery-buddy-pirate.zip
-cd battery-buddy-pirate
+sudo apt install libglib2.0-bin
 ./install.sh
-```
-
-On **GNOME Wayland**, **log out and back in** to load a new extension. Then:
-
-```bash
+# On GNOME Wayland log out and log back in once for first-time registration
 gnome-extensions enable battery-buddy-pirate@ignis.local
+gnome-extensions prefs battery-buddy-pirate@ignis.local
 ./demo.sh high
 ./demo.sh low
 ./demo.sh stop
 ```
 
-If not visible, check `gnome-extensions list`, `gnome-extensions info battery-buddy-pirate@ignis.local` and GNOME Shell logs: `journalctl --user -b /usr/bin/gnome-shell --no-pager -n 100` (service exec path may differ).
+**Important:** the `demo.sh` script is for local testing and is not included in the GNOME Extensions upload ZIP. The demo request expires after 45 seconds.
 
-## Disable
+## Build a GNOME Extensions submission ZIP
 
 ```bash
-gnome-extensions disable battery-buddy-pirate@ignis.local
+./package.sh
 ```
 
-To restore the older popup daemon (if still installed): `systemctl --user enable --now battery-buddy.service`.
+Upload the generated `dist/battery-buddy-gnome.zip` at https://extensions.gnome.org/upload/ after you have tested GNOME compatibility and reviewed/maintained the code. **This repository is not published or approved on extensions.gnome.org yet.** The local installer also needs logout/login for initial GNOME Shell discovery on Wayland.
 
-## Notes
+## Notes and limitations
 
-- New extension loading on Wayland generally needs one log-out/log-in; `Alt+F2 r` is not a safe replacement on Wayland.
-- The character appears on the *primary* monitor, not both. It doesn't block the rest of the desktop.
-- This app only observes battery state. It cannot cap charging on HP hardware.
-- The transparent character is extracted from your uploaded reference image, not the rendered desktop mockup.
-- A third-party GNOME extension executes inside the GNOME Shell process; disable it if you observe shell issues. This build is not yet tested on your machine.
+- This does not set an HP firmware charge threshold or switch off the power adapter. It only reminds you.
+- It uses the first available `/sys/class/power_supply/BAT*` battery, which is appropriate for most laptops. It does not yet combine multiple batteries.
+- GNOME top chrome is confined to the selected monitor. The panel is intentionally small, but it can overlap desktop windows while visible.
+- System emoji rendering depends on your installed fonts.
+- The earlier Captain Hook-derived image is excluded from distribution due to copyright concerns.
+- Generated with AI for personal use. Before submitting to GNOME Extensions, review and understand the JavaScript and maintain it yourself.
+
+## Development
+
+`node --check extension.js && node --check prefs.js` checks JavaScript syntax; it does **not** establish compatibility with a live GNOME Shell. Run a real GNOME 50 session test and inspect `journalctl --user -b` if an extension error occurs.
+
+License: GPL-3.0-or-later.

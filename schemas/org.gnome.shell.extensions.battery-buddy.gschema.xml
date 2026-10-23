@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.shell.extensions.battery-buddy" path="/org/gnome/shell/extensions/battery-buddy/">
+    <key name="alerts-enabled" type="b"><default>true</default><summary>Enable reminders</summary></key>
+    <key name="high-threshold" type="i"><default>80</default><range min="50" max="100"/><summary>Unplug threshold</summary></key>
+    <key name="low-threshold" type="i"><default>20</default><range min="5" max="49"/><summary>Plug-in threshold</summary></key>
+    <key name="character" type="s"><default>'pirate'</default><summary>Character</summary></key>
+    <key name="character-size" type="i"><default>92</default><range min="48" max="180"/><summary>Character size</summary></key>
+    <key name="monitor" type="s"><default>'primary'</default><summary>Monitor selection</summary></key>
+    <key name="start-corner" type="i"><default>1</default><range min="0" max="3"/><summary>Starting corner</summary></key>
+    <key name="edge-margin" type="i"><default>24</default><range min="0" max="150"/><summary>Screen edge margin</summary></key>
+    <key name="show-hint" type="b"><default>true</default><summary>Show interaction hint</summary></key>
+    <key name="animate-hops" type="b"><default>true</default><summary>Animate character hops</summary></key>
+    <key name="hop-duration" type="i"><default>520</default><range min="100" max="2000"/><summary>Hop animation duration</summary></key>
+    <key name="check-interval" type="i"><default>3</default><range min="2" max="60"/><summary>Battery polling interval</summary></key>
+  </schema>
+</schemalist>
