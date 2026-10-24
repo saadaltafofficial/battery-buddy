@@ -7,11 +7,46 @@
     <key name="character" type="s"><default>'pirate'</default><summary>Character</summary></key>
     <key name="character-size" type="i"><default>92</default><range min="48" max="180"/><summary>Character size</summary></key>
     <key name="monitor" type="s"><default>'primary'</default><summary>Monitor selection</summary></key>
-    <key name="start-corner" type="i"><default>1</default><range min="0" max="3"/><summary>Starting corner</summary></key>
     <key name="edge-margin" type="i"><default>24</default><range min="0" max="150"/><summary>Screen edge margin</summary></key>
     <key name="show-hint" type="b"><default>true</default><summary>Show interaction hint</summary></key>
-    <key name="animate-hops" type="b"><default>true</default><summary>Animate character hops</summary></key>
-    <key name="hop-duration" type="i"><default>520</default><range min="100" max="2000"/><summary>Hop animation duration</summary></key>
+    <key name="roam" type="b"><default>true</default><summary>Walk around the screen</summary></key>
+    <key name="walk-speed" type="i"><default>70</default><range min="20" max="300"/><summary>Walking speed in pixels per second</summary></key>
+    <key name="hop-duration" type="i"><default>700</default><range min="200" max="2000"/><summary>Jump duration in milliseconds</summary></key>
     <key name="check-interval" type="i"><default>3</default><range min="2" max="60"/><summary>Battery polling interval</summary></key>
+
+    <!-- Fun -->
+    <key name="sounds" type="b"><default>false</default><summary>Play buddy sounds</summary></key>
+    <key name="seasonal" type="b"><default>true</default><summary>Seasonal outfits and night mode</summary></key>
+    <key name="escalate" type="b"><default>true</default><summary>Get pushier when a reminder is ignored</summary></key>
+    <key name="helpers" type="b"><default>true</default><summary>A second buddy joins when a reminder is ignored for a long time</summary></key>
+    <key name="unlock-all" type="b"><default>false</default><summary>Make every buddy available without earning it</summary></key>
+    <key name="cameos" type="b"><default>true</default><summary>Short visits: cheer on plug-in, yawn after suspend, sweat when the CPU is hot</summary></key>
+    <key name="accessory" type="s"><default>'best'</default><summary>Accessory to wear: best, none, shades or crown</summary></key>
+    <key name="show-estimate" type="b"><default>true</default><summary>Show time left or time to full in the status pill</summary></key>
+
+    <!-- Quiet times -->
+    <key name="show-indicator" type="b"><default>true</default><summary>Show the top bar menu</summary></key>
+    <key name="snooze-until" type="x"><default>0</default><summary>Reminders are snoozed until this Unix time</summary></key>
+    <key name="quiet-when-sharing" type="b"><default>true</default><summary>Stay hidden while the screen is shared or recorded</summary></key>
+    <key name="respect-dnd" type="b"><default>true</default><summary>Stay hidden while Do Not Disturb is on</summary></key>
+    <key name="weekly-report" type="b"><default>true</default><summary>Weekly summary notification</summary></key>
+    <key name="unlocked" type="as"><default>['pirate', 'cat', 'robot']</default><summary>Buddies that have been unlocked</summary></key>
+
+    <!-- Stats, written by the extension -->
+    <key name="streak" type="i"><default>0</default><summary>Reminders fixed in time in a row</summary></key>
+    <key name="best-streak" type="i"><default>0</default><summary>Longest streak</summary></key>
+    <key name="day-streak" type="i"><default>0</default><summary>Days with reminders fixed in time and none ignored</summary></key>
+    <key name="streak-day" type="s"><default>''</default><summary>Last day counted towards the day streak (YYYY-MM-DD)</summary></key>
+    <key name="obeyed" type="i"><default>0</default><summary>Reminders fixed in time</summary></key>
+    <key name="reminders" type="i"><default>0</default><summary>Reminders fixed in total</summary></key>
+    <key name="unplugged-early" type="i"><default>0</default><summary>Times unplugged at the unplug reminder</summary></key>
+    <key name="batteries-caught" type="i"><default>0</default><summary>Bonus batteries caught in the mini-game</summary></key>
+    <key name="week-start" type="s"><default>''</default><summary>Monday of the week being counted (YYYY-MM-DD)</summary></key>
+    <key name="week-obeyed" type="i"><default>0</default><summary>Reminders fixed in time this week</summary></key>
+    <key name="week-reminders" type="i"><default>0</default><summary>Reminders fixed this week</summary></key>
+    <key name="week-best" type="i"><default>0</default><summary>Best streak reached this week</summary></key>
+    <key name="last-report" type="s"><default>''</default><summary>Week whose summary was already sent</summary></key>
+    <key name="health-log" type="as"><default>[]</default><summary>Daily battery health readings (date:health%:cycles)</summary></key>
+    <key name="charge-spared" type="i"><default>0</default><summary>Percentage points not charged above the unplug point, summed</summary></key>
   </schema>
 </schemalist>

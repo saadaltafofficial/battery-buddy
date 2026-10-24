@@ -1,4 +1,8 @@
-.battery-buddy { padding: 4px 8px; spacing: 3px; text-align: center; border-radius: 15px; background-color: rgba(19, 25, 38, 0.90); color: #f8fafc; }
-.battery-buddy-character { text-align: center; font-size: 1em; }
-.battery-buddy-title { text-align: center; font-size: 14px; font-weight: 700; }
-.battery-buddy-hint { text-align: center; font-size: 10px; color: #c4cbd6; }
+.battery-buddy { spacing: 2px; background-color: transparent; }
+.battery-buddy-pill {
+  padding: 4px 11px 4px 9px; spacing: 6px; border-radius: 99px;
+  background-color: rgba(20, 24, 38, 0.88); color: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+}
+.battery-buddy-pill-label { font-size: 12px; font-weight: 700; }
+.battery-buddy-hint { font-size: 10px; color: rgba(255, 255, 255, 0.85); text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8); }

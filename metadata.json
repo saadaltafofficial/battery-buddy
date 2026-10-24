@@ -4,6 +4,6 @@
   "description": "Configurable animated battery reminders with friendly characters, screen placement and charge thresholds.",
   "shell-version": ["46", "47", "48", "49", "50"],
   "settings-schema": "org.gnome.shell.extensions.battery-buddy",
-  "version": 3,
+  "version": 6,
   "url": "https://github.com/saadaltafofficial/battery-buddy"
 }
