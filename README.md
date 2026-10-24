@@ -47,7 +47,7 @@ gnome-extensions prefs battery-buddy-pirate@ignis.local
 ./demo.sh stop
 ```
 
-**Important:** the `demo.sh` script is for local testing and is not included in the GNOME Extensions upload ZIP. The demo request expires after 45 seconds.e
+**Important:** the `demo.sh` script is for local testing and is not included in the GNOME Extensions upload ZIP. The demo request expires after 45 seconds.
 
 ## Uninstall
 
@@ -65,6 +65,32 @@ Log out and back in afterwards so GNOME Shell fully unloads it.
 ```
 
 Upload the generated `dist/battery-buddy-gnome.zip` at https://extensions.gnome.org/upload/ after you have tested GNOME compatibility and reviewed/maintained the code. **This repository is not published or approved on extensions.gnome.org yet.** The local installer also needs logout/login for initial GNOME Shell discovery on Wayland.
+
+## Desktop app (Windows, macOS, other Linux desktops)
+
+`desktop/` is an Electron version of the same buddies for systems without GNOME Shell. It runs the same `engine.js`, `characters.js` and `personality.js` (copied in by `npm run sync`) and reads its default settings from the GSettings schema, so both versions behave the same. It lives in the tray: battery status, snooze, summon, demos and settings are in the tray menu.
+
+```bash
+cd desktop
+npm install
+npm start                         # copies the shared code, then launches
+npm run dist:win                  # or dist:mac / dist:linux; output goes to desktop/dist/
+```
+
+While it's running, launching it again passes commands to the running copy:
+
+```bash
+npx electron . --demo party       # high, low, party, celebrate, ignore, stop
+npx electron . --snooze 60
+npx electron . --summon
+npx electron . --settings
+```
+
+Notes:
+
+- Battery level comes from the browser battery API, plus OS details (health, temperature, presentation mode) from the main process: sysfs on Linux, a small PowerShell probe on Windows. A desktop PC with no battery shows no reminders.
+- Settings are stored in `settings.json` in the app's user data folder. "Start at login" applies only to the installed app on Windows and macOS.
+- If you run it from VS Code's terminal and get `does not provide an export named 'BrowserWindow'`, the terminal has `ELECTRON_RUN_AS_NODE=1` set. Run `unset ELECTRON_RUN_AS_NODE` first.
 
 ## Notes and limitations
 

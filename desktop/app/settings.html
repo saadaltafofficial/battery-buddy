@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Battery Buddy Settings</title>
+  <link rel="stylesheet" href="settings.css">
+</head>
+<body>
+  <header>
+    <nav role="tablist">
+      <button role="tab" id="tab-buddy" aria-controls="page-buddy" aria-selected="true">Battery Buddy</button>
+      <button role="tab" id="tab-stats" aria-controls="page-stats" aria-selected="false">Stats</button>
+    </nav>
+  </header>
+  <main>
+    <section id="page-buddy" role="tabpanel" aria-labelledby="tab-buddy"></section>
+    <section id="page-stats" role="tabpanel" aria-labelledby="tab-stats" hidden></section>
+  </main>
+  <script type="module" src="settings.js"></script>
+</body>
+</html>

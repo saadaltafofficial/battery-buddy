@@ -1,0 +1,33 @@
+{
+  "name": "battery-buddy",
+  "productName": "Battery Buddy",
+  "version": "1.0.0",
+  "description": "Animated desktop companions that remind you to plug in and unplug your laptop charger.",
+  "homepage": "https://github.com/saadaltafofficial/battery-buddy",
+  "author": "saadaltaflaldins",
+  "license": "GPL-3.0-or-later",
+  "type": "module",
+  "main": "main.js",
+  "scripts": {
+    "sync": "node scripts/sync-shared.mjs",
+    "start": "npm run sync && electron .",
+    "dist:win": "npm run sync && electron-builder --win",
+    "dist:mac": "npm run sync && electron-builder --mac",
+    "dist:linux": "npm run sync && electron-builder --linux"
+  },
+  "devDependencies": {
+    "electron": "44.7.0",
+    "electron-builder": "26.17.0"
+  },
+  "build": {
+    "appId": "io.github.saadaltafofficial.batterybuddy",
+    "productName": "Battery Buddy",
+    "files": ["main.js", "preload.cjs", "system/**", "app/**", "package.json"],
+    "directories": {"buildResources": "build", "output": "dist"},
+    "win": {"target": ["nsis", "portable"], "icon": "build/icon.png"},
+    "nsis": {"oneClick": true, "perMachine": false, "createDesktopShortcut": false, "artifactName": "Battery-Buddy-Setup-${version}.${ext}"},
+    "portable": {"artifactName": "Battery-Buddy-${version}-portable.${ext}"},
+    "mac": {"target": ["dmg"], "category": "public.app-category.utilities", "icon": "build/icon.png", "extendInfo": {"LSUIElement": true}},
+    "linux": {"target": ["AppImage"], "category": "Utility", "icon": "build/icon.png"}
+  }
+}

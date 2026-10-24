@@ -1,0 +1,104 @@
+/* Buddies on a transparent, full-screen overlay. Same look as the GNOME version. */
+:root {
+  --outline: #232733;
+  --pill: rgba(20, 24, 38, 0.88);
+  --good: #5ad98a;
+  --low: #ff7350;
+  font-family: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, "Ubuntu Sans", Cantarell, sans-serif;
+}
+
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: transparent;
+  user-select: none;
+  cursor: default;
+}
+
+[hidden] { display: none !important; }
+
+#stage { position: fixed; inset: 0; }
+
+.buddy {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  will-change: transform;
+}
+
+/* Comic speech bubble with an outlined tail pointing down at the buddy. */
+.bubble {
+  position: relative;
+  box-sizing: border-box;
+  max-width: 100%;
+  width: fit-content;
+  margin-bottom: 10px;
+  padding: 6px 12px;
+  border: 2.4px solid var(--outline);
+  border-radius: 16px;
+  background: #fff;
+  color: var(--outline);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.3;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+.bubble::before,
+.bubble::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  border-style: solid;
+  border-color: transparent;
+}
+.bubble::before {
+  bottom: -12px;
+  margin-left: -8px;
+  border-width: 12px 8px 0;
+  border-top-color: var(--outline);
+}
+.bubble::after {
+  bottom: -8px;
+  margin-left: -5px;
+  border-width: 8.5px 5px 0;
+  border-top-color: #fff;
+}
+
+.buddy canvas { display: block; }
+
+.pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 11px 4px 9px;
+  border-radius: 99px;
+  background: var(--pill);
+  color: #fff;
+  font-size: 12.5px;
+  font-weight: 700;
+  white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+}
+.pill svg { display: block; color: var(--good); }
+.pill.low svg { color: var(--low); }
+
+.hint {
+  font-size: 10.5px;
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
+}
+
+/* Bonus battery for the mini-game */
+.pickup {
+  position: absolute;
+  width: 28px;
+  height: 38px;
+  cursor: pointer;
+}
+.pickup svg { display: block; }

@@ -424,6 +424,11 @@ export class Engine {
 
     onMonitorsChanged() {
         this.platform.pickMonitor();
+        this.fitInside();
+    }
+
+    // The screen area changed size: keep everyone on it.
+    fitInside() {
         for (const b of this.buddies) b.keepInside(this._bounds(b));
     }
 
