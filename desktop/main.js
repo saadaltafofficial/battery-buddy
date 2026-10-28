@@ -74,7 +74,9 @@ function start() {
 function applyLoginItem() {
     // Only for the installed app; a dev run shouldn't register Electron itself.
     if (!app.isPackaged || !['win32', 'darwin'].includes(process.platform)) return;
-    app.setLoginItemSettings({openAtLogin: store.get('start-at-login')});
+    // The portable Windows build runs from a temp folder; register the real .exe instead.
+    const portable = process.env.PORTABLE_EXECUTABLE_FILE;
+    app.setLoginItemSettings({openAtLogin: store.get('start-at-login'), ...(portable ? {path: portable} : {})});
 }
 
 // ---- Overlay: one transparent, click-through window over the chosen screen -------

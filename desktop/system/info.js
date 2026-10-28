@@ -192,7 +192,7 @@ export class SystemInfo extends EventEmitter {
             cycles: p.cycles > 0 ? p.cycles : null,
             runMinutes: p.run > 0 && p.run < NO_ESTIMATE ? p.run : null,
             temperature: kelvin > 0 ? Math.round(kelvin / 10 - 273.15) : null,
-            sharing: [2, 3, 4].includes(p.notify),
+            sharing: [2, 3, 4, 7].includes(p.notify),
         });
     }
 }

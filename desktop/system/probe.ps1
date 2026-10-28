@@ -28,7 +28,8 @@ while ($true) {
     # Usually needs admin rights; null otherwise.
     $temp = (@(Get-CimInstance -Namespace root/wmi -ClassName MSAcpi_ThermalZoneTemperature) | Measure-Object -Property CurrentTemperature -Maximum).Maximum
 
-    # 2 = busy/full-screen app, 3 = full-screen game, 4 = presentation mode.
+    # 2 = busy/full-screen app, 3 = full-screen game, 4 = presentation mode,
+    # 7 = full-screen Store app.
     $state = 0
     [void][BatteryBuddy.Native]::SHQueryUserNotificationState([ref]$state)
 
